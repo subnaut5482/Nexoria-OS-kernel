@@ -1,0 +1,46 @@
+name: Build NexoriaOS Kernel
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installa dipendenze di build
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential bc bison flex libssl-dev libelf-dev \
+            cpio pahole gnupg curl xz-utils
+
+      - name: Scarica e verifica il kernel vanilla
+        run: |
+          curl -O https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-7.1.3.tar.xz
+          curl -O https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-7.1.3.tar.sign
+          gpg --locate-keys torvalds@kernel.org gregkh@kernel.org
+          xz -d -k linux-7.1.3.tar.xz
+          gpg --verify linux-7.1.3.tar.sign linux-7.1.3.tar
+          tar xf linux-7.1.3.tar.xz
+
+      - name: Applica le patch
+        working-directory: linux-7.1.3
+        run: |
+          patch -p1 < ../patches/0001-linux7.1-rc1-bore-6.6.3.patch
+          patch -p1 < ../patches/more-ISA-levels-and-uarches-for-kernel-6.16+.patch
+
+      - name: Applica la config e compila
+        working-directory: linux-7.1.3
+        run: |
+          cp ../patches/kernel.config .config
+          make olddefconfig
+          make -j$(nproc)
+          make -j$(nproc) tar-pkg
+
+      - name: Carica il kernel compilato
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexoriaos-kernel-v2
+          path: linux-7.1.3/linux-*.tar.gz
