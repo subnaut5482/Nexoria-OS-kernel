@@ -43,4 +43,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: nexoriaos-kernel-v2
-          path: linux-7.1.3/linux-*.tar.gz
+          path: linux-7.1.3/linux-7.1.3-x86.tar
