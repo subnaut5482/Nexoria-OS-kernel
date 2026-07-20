@@ -43,8 +43,8 @@ jobs:
           make LLVM=1 olddefconfig
           grep -q "^CONFIG_LTO_CLANG_THIN=y" .config || (echo "ERRORE: LTO non attivato" && exit 1)
           grep -q "^CONFIG_PREEMPT_DYNAMIC=y" .config || (echo "ERRORE: PREEMPT_DYNAMIC non attivato" && exit 1)
-          make LLVM=1 KCFLAGS="-fivopts -fmodulo-sched" -j$(nproc)
-          make LLVM=1 KCFLAGS="-fivopts -fmodulo-sched" -j$(nproc) tar-pkg
+          make LLVM=1 -j$(nproc)
+          make LLVM=1 -j$(nproc) tar-pkg
 
       - name: Carica il kernel compilato
         uses: actions/upload-artifact@v4
