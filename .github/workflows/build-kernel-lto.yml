@@ -33,7 +33,7 @@ jobs:
           grep -q "config X86_64_VERSION" arch/x86/Kconfig.cpu || (echo "ERRORE: opzione X86_64_VERSION mancante, patch non applicata correttamente" && exit 1)
           grep -q "config SCHED_BORE" init/Kconfig || (echo "ERRORE: opzione SCHED_BORE mancante, patch BORE non applicata correttamente" && exit 1)
 
-- name: Applica la config e compila con LTO+Clang
+      - name: Applica la config e compila con LTO+Clang
         working-directory: linux-7.1.3
         run: |
           cp ../patches/kernel.config .config
